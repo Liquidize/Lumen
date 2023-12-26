@@ -21,5 +21,4 @@ RUN dotnet publish "./Lumen.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:U
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN mkdir -p bin/Debug/net8.0/locations   # Create the directory here
 ENTRYPOINT ["dotnet", "Lumen.dll"]

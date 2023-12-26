@@ -43,7 +43,10 @@ namespace Lumen.Registries
         }
 
         public List<Location> JsonLocations { get; private set; } = new List<Location>();
-        public List<Location> InternalLocations { get; private set; } = new List<Location>();
+        public List<Location> InternalLocations { get; private set; } = new List<Location>()
+        {
+         
+        };
         public  List<Location> AllLocations => JsonLocations.Concat(InternalLocations).ToList();
 
         private readonly FileSystemWatcher _fileSystemWatcher = new FileSystemWatcher();
@@ -172,7 +175,6 @@ namespace Lumen.Registries
                     TypeNameHandling = TypeNameHandling.Auto,
                     TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                     ContractResolver = new DefaultContractResolver() { NamingStrategy = new CamelCaseNamingStrategy() },
-                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
 
                 };
 

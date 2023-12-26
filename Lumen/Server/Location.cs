@@ -249,7 +249,7 @@ namespace Lumen.Server
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
+                    // We need to do this or the controllers remain when reloading the location
                     Controllers = null;
                     ScheduledEffects = null;
                 }
