@@ -1,0 +1,3 @@
+[submodule "Lumen.Api"]
+	path = Lumen.Api
+	url = https://github.com/Liquidize/Lumen.Api.git
