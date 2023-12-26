@@ -1,0 +1,42 @@
+{
+  "name": "Desk",
+  "isApiEnabled": true,
+  "controllers": [
+    {
+      "host": "73.73.10.40",
+      "name": "Desk",
+      "useCompression": true,
+      "channel": 0,
+      "swapRedGreen": false,
+      "batchSize": 20,
+      "framesPerBuffer":500,
+      "reversed": false,
+      "offset": 0,
+      "width": 316,
+      "height": 1
+    }
+  ],
+  "scheduledEffects": [
+    {
+      "effectName": "SimpleDotRunEffect",
+      "daysOfWeek": 7,
+      "startHour": 0,
+      "startMinute": 0,
+      "endHour": 24,
+      "endMinute": 60,
+      "effectSettings": {
+        "color": {
+          "$type": "Lumen.Api.Graphics.LedColor, Lumen.Api",
+          "r": 0,
+          "g": 100,
+          "b": 0
+        },
+        "lifetime": 11
+      }
+    }
+  ],
+  "framesPerSecond": 30,
+  "canvasType": "Canvas1D",
+  "width": 316,
+  "height": 1
+}
