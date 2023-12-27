@@ -62,7 +62,6 @@ public class EffectsApi : ControllerBase
             return new ApiResponse(HttpStatusCode.BadRequest, $"No effect found with name {data.Effect}");
         }
 
-
         effect.SetEffectParameters(data.Settings);
         location.SetForcedEffect(effect);
         return new ApiResponse(HttpStatusCode.OK, "Force set effect successfully");
