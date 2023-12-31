@@ -12,7 +12,7 @@ Lumen is a project based on [NightDriverServer](https://github.com/PlummersSoftw
    
    
 ## About the Code
-Quite a bit of the code is directly inspired or even taken from NightDriverServer itself. This project was partially created as a way for me to familiarize myself with the functionality of NightDriverServer via writing the code again instead of just reading it. For that reason this project will be licensed under whatever license NightDriverServer is using, which I believe to be GPL 2.
+Quite a bit of the code is directly inspired or even taken from NightDriverServer itself. This project was partially created as a way for me to familiarize myself with the functionality of NightDriverServer via writing the code again instead of just reading it. For that reason this project will be licensed under whatever license NightDriverServer is using, which is GPL v3
 
 Some aspects are rather different due to my intention of having this be used by some end users without having to compile their own version, thus an attempt to keep it relatively simple. In addition to not really understanding the purpose as to why they were done that way in NightDriverServer to begin with.  Some examples of this are as follows:
 
