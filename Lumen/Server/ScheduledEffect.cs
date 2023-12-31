@@ -16,7 +16,7 @@ namespace Lumen.Server
         [JsonProperty("effectName")]
         public string EffectName { get; protected set; }
         [JsonProperty("daysOfWeek")]
-        public DayOfWeek DaysOfWeek { get; protected set; }
+        public string[] DaysOfWeek { get; protected set; }
         [JsonProperty("startHour")]
         public uint StartHour { get; protected set; }
         [JsonProperty("startMinute")]
@@ -26,10 +26,13 @@ namespace Lumen.Server
         [JsonProperty("endMinute")]
         public uint EndMinute { get; protected set;}
 
-        [JsonProperty("effectSettings")]
-        public Dictionary<string,object> EffectSettings { get; protected set; }
+        [JsonProperty("settings")]
+        public Dictionary<string,object> Settings { get; protected set; }
 
-        public ScheduledEffect(DayOfWeek daysOfWeek, string effectName, uint startHour, uint endHour,
+        [JsonProperty("id")]
+        public string Id { get; protected set; } = Guid.NewGuid().ToString("N").Substring(0, 8);
+
+        public ScheduledEffect(string[] daysOfWeek, string effectName, uint startHour, uint endHour,
             uint startMinute = 0, uint endMinute = 60)
         {
             EffectName = effectName;
@@ -44,7 +47,7 @@ namespace Lumen.Server
         {
             get
             {
-                if (DaysOfWeek.HasFlag(DateTime.Now.DayOfWeek))
+                if (DaysOfWeek.Any(d => (d.Equals(DateTime.Now.DayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase) || d.Equals("all", StringComparison.OrdinalIgnoreCase))))
                     if (DateTime.Now.Hour > StartHour || DateTime.Now.Hour == StartHour && DateTime.Now.Minute >= StartMinute)
                         if (DateTime.Now.Hour < EndHour || DateTime.Now.Hour == EndHour && DateTime.Now.Minute <= EndMinute)
                             return true;

@@ -4,21 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lumen.Api.Effects;
+using Lumen.Api.Graphics;
 
 namespace Lumen.Registries
 {
     public interface IEffectRegistry
     {
-        public LedEffect CreateEffectInstance(string effectName);
+        public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, Dictionary<string, object> settings);
     }
 
     public class EffectRegistry : IEffectRegistry
     {
-        private readonly Dictionary<string, Func<LedEffect>> EffectFactories = new Dictionary<string, Func<LedEffect>>();
+        private readonly Dictionary<string, Func<ILedCanvas, Dictionary<string, object>, LedEffect>> effectFactories = new Dictionary<string, Func<ILedCanvas, Dictionary<string, object>, LedEffect>>();
 
-        public void RegisterEffect(string effectName, Func<LedEffect> factory)
+        public void RegisterEffect(string effectName, Func<ILedCanvas, Dictionary<string, object>, LedEffect> factory)
         {
-            EffectFactories.TryAdd(effectName, factory);
+            effectFactories.TryAdd(effectName, factory);
         }
 
         public void LoadEffects()
@@ -27,23 +28,20 @@ namespace Lumen.Registries
                 .Where(t => typeof(LedEffect).IsAssignableFrom(t) && !t.IsAbstract);
             foreach (var effectType in effectTypes)
             {
-                var instance = Activator.CreateInstance(effectType) as LedEffect;
-                if (instance.Name != null)
-                    RegisterEffect(instance.Name, () => Activator.CreateInstance(effectType) as LedEffect);
+                    RegisterEffect(effectType.Name, (canvas, settings) => Activator.CreateInstance(effectType, canvas, settings) as LedEffect);
             }
         }
 
-        public LedEffect CreateEffectInstance(string effectName)
+        public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, Dictionary<string, object> settings)
         {
-            if (EffectFactories.TryGetValue(effectName, out var effect))
+            if (effectFactories.TryGetValue(effectName, out var factory))
             {
-                return effect.Invoke();
+                return factory.Invoke(canvas, settings);
             }
             else
             {
                 return null;
             }
         }
-
     }
 }

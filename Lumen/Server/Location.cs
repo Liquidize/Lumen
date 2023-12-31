@@ -55,7 +55,7 @@ namespace Lumen.Server
 
         private LedEffect _forcedEffect { get;  set; } = null;
 
-        private readonly ConcurrentQueue<QueuedEffect> effectQueue = new ConcurrentQueue<QueuedEffect>();
+        private readonly ConcurrentQueue<LedEffect> effectQueue = new ConcurrentQueue<LedEffect>();
 
         private DateTime _lastUpdateTime;
 
@@ -138,11 +138,9 @@ namespace Lumen.Server
                 }
 
 
-                // Update
-                ActiveEffect.Update(deltaTime.TotalMilliseconds);
 
-                // Render and send to controllers
-                ActiveEffect.DrawFrame(Canvas, deltaTime.TotalMilliseconds);
+                // Update and  Render and send to controllers
+                ActiveEffect.DrawFrame(deltaTime.TotalMilliseconds);
 
                 foreach (var controller in Controllers)
                 {
@@ -191,7 +189,7 @@ namespace Lumen.Server
             _forcedEffect = effect;
         }
 
-        public void EnqueueEffect(QueuedEffect effect)
+        public void EnqueueEffect(LedEffect effect)
         {
             if (effect == null) return;
             effectQueue.Enqueue(effect);
@@ -203,27 +201,33 @@ namespace Lumen.Server
 
             if (effectQueue.TryDequeue(out var queuedEffect))
             {
-                var effect = Lumen.EffectRegistry.CreateEffectInstance(queuedEffect.Effect);
-                if (effect != null)
-                {
-                    effect.SetEffectParameters(queuedEffect.Settings);
-                    return effect;
-                }
+                return queuedEffect;
             }
 
-            var scheduledEffected = ScheduledEffects.Where(scheduled => scheduled.IsEffectScheduledToRunNow);
+            var scheduledEffected = ScheduledEffects.Where(scheduled =>
+            {
+                Log.Information(scheduled.IsEffectScheduledToRunNow.ToString());
+                Log.Information(scheduled.DaysOfWeek.ToString());
+                return scheduled.IsEffectScheduledToRunNow;
+            });
             if (scheduledEffected.Any())
             {
                 var nextEffect = scheduledEffected.First();
-                var scheduledEffect = Lumen.EffectRegistry.CreateEffectInstance(nextEffect.EffectName);
+                var scheduledEffect = Lumen.EffectRegistry.CreateEffectInstance(nextEffect.EffectName, Canvas, nextEffect.Settings);
                 if (scheduledEffect != null)
                 {
-                    scheduledEffect.SetEffectParameters(nextEffect.EffectSettings);
+                    scheduledEffect.SetId(nextEffect.Id);
                     return scheduledEffect;
                 }
             }
 
             return null;
+        }
+
+
+        public ConcurrentQueue<LedEffect> GetEffectQueue()
+        {
+            return effectQueue;
         }
 
 

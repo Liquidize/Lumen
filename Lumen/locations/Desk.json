@@ -3,41 +3,42 @@
   "isApiEnabled": true,
   "controllers": [
     {
-      "host": "73.73.10.40",
+      "host": "73.73.10.42",
       "name": "Monitor",
       "useCompression": true,
       "channel": 0,
       "swapRedGreen": false,
       "batchSize": 20,
-      "framesPerBuffer": 500,
+      "framesPerBuffer": 250,
       "reversed": false,
       "offset": 0,
-      "width": 316,
+      "width": 678,
       "height": 1
     }
   ],
   "scheduledEffects": [
     {
-      "effectName": "BreathingEffect",
-      "daysOfWeek": 7,
+      "effectName": "ColorWipeEffect",
+      "id":  "testColorWipe",
+      "daysOfWeek": ["all"],
       "startHour": 0,
       "startMinute": 0,
       "endHour": 24,
       "endMinute": 60,
-      "effectSettings": {
+      "settings": {
         "color": {
           "$type": "Lumen.Api.Graphics.LedColor, Lumen.Api",
           "r": 255,
-          "g": 0,
+          "g": 128,
           "b": 0
         },
-        "lifetime": 0,
+        "lifetime": 11.28,
         "frequency": 5
       }
     }
   ],
-  "framesPerSecond": 30,
+  "framesPerSecond": 60,
   "canvasType": "Canvas1D",
-  "width": 316,
+  "width": 678,
   "height": 1
 }
