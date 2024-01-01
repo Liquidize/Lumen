@@ -2,11 +2,15 @@
 
 namespace Lumen.Web
 {
-    public record ApiResponse(HttpStatusCode StatusCode, string Content)
+    public record ApiResponse<T>
     {
-        public ApiResponse() : this(HttpStatusCode.OK, string.Empty)
-        {
+        public HttpStatusCode StatusCode { get; init; }
+        public T Content { get; init; }
 
+        public ApiResponse(HttpStatusCode statusCode, T content)
+        {
+            StatusCode = statusCode;
+            Content = content;
         }
     }
 }

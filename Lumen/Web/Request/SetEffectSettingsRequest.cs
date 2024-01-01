@@ -9,9 +9,9 @@ using Newtonsoft.Json;
 
 namespace Lumen.Web.Request
 {
-    public record EffectSettingsRequest(string Location, string Id, bool MergeDefaults, Dictionary<string, object> Settings)
+    public record SetEffectSettingsRequest(string Location, string Id, bool MergeDefaults, Dictionary<string, object> Settings)
     {
-        public EffectSettingsRequest() : this(string.Empty, string.Empty, false, new Dictionary<string, object>())
+        public SetEffectSettingsRequest() : this(string.Empty, string.Empty, false, new Dictionary<string, object>())
         {
 
         }

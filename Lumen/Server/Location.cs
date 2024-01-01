@@ -206,8 +206,6 @@ namespace Lumen.Server
 
             var scheduledEffected = ScheduledEffects.Where(scheduled =>
             {
-                Log.Information(scheduled.IsEffectScheduledToRunNow.ToString());
-                Log.Information(scheduled.DaysOfWeek.ToString());
                 return scheduled.IsEffectScheduledToRunNow;
             });
             if (scheduledEffected.Any())
