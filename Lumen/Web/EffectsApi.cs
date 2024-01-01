@@ -164,6 +164,46 @@ public class EffectsApi : ControllerBase
 
     }
 
+    /// <summary>
+    /// Clears the active effect by setting the forced effect to null and requesting the active effect to end.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    [HttpPost("effects/clearactive")]
+    public async Task<ApiResponse<string>> ClearActiveEffect(ClearActiveEffectRequest data)
+    {
+        Log.Information($"[HTTP] {nameof(ClearActiveEffect)} triggered with {data}.");
+
+        if (string.IsNullOrEmpty(data.Location))
+        {
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location is required");
+        }
+
+        var location =
+            _locationRegistry.GetLocation(data.Location);
+        if (location == null)
+        {
+            Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+        }
+
+        if (!location.IsApiEnabled)
+        {
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
+        }
+
+        // Request the active effect to end by setting the forced effect to nothing.
+        location.SetForcedEffect(null);
+
+        return new ApiResponse<string>(HttpStatusCode.OK, "Cleared");
+    }
+
+    /// <summary>
+    /// Sets the settings for the effect with the given ID, if the effect is not found in the queue or active effect, a 400 is returned.
+    /// If the effect is found and the settings are set successfully, a 200 is returned with the new settings in JSON format
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     [HttpPost("effects/settings/set")]
     public async Task<ApiResponse<string>> SetEffectSettings(SetEffectSettingsRequest data)
     {
@@ -202,6 +242,11 @@ public class EffectsApi : ControllerBase
         return new ApiResponse<string>(HttpStatusCode.OK, JsonConvert.SerializeObject(effect.GetEffectSettings()));
     }
 
+    /// <summary>
+    /// Gets the current settings for the effect with the given ID, if the effect is not found in the queue or active effect, a 400 is returned.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     [HttpPost("effects/settings/get")]
     public async Task<ApiResponse<string>> GetEffectSettings(GetEffectSettingsRequest data)
     {

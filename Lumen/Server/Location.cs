@@ -183,7 +183,6 @@ namespace Lumen.Server
 
         public void SetForcedEffect(LedEffect effect)
         {
-            if (effect == null) return;
             if (ActiveEffect != null) 
                 ActiveEffect.RequestEnd();
             _forcedEffect = effect;
