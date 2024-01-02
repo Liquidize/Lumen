@@ -72,7 +72,7 @@ public class EffectsApi : ControllerBase
 
         effect.SetId(guid);
 
-        location.SetForcedEffect((LedEffect)effect);
+        location.SetForcedEffect((LedEffect<EffectSettings>)effect);
         return new ApiResponse<string>(HttpStatusCode.OK, guid);
 
     }
@@ -236,10 +236,12 @@ public class EffectsApi : ControllerBase
             return new ApiResponse<string>(HttpStatusCode.BadRequest, $"No effect found with ID {data.Id}");
         }
 
-        effect.SetEffectSettings(data.Settings,data.MergeDefaults);
+        effect.SetEffectSettings(data.Settings);
 
+        var settings = effect.GetEffectSettings();
+        string json = Utility.SerializeToJson(settings);
 
-        return new ApiResponse<string>(HttpStatusCode.OK, JsonConvert.SerializeObject(effect.GetEffectSettings()));
+        return new ApiResponse<string>(HttpStatusCode.OK, json);
     }
 
     /// <summary>
@@ -278,7 +280,10 @@ public class EffectsApi : ControllerBase
             return new ApiResponse<string>(HttpStatusCode.BadRequest, $"No effect found with ID {data.Id}");
         }
 
-        return new ApiResponse<string>(HttpStatusCode.OK, JsonConvert.SerializeObject(effect.GetEffectSettings()));
+        var settings = effect.GetEffectSettings();
+        string json = Utility.SerializeToJson(settings);
+
+        return new ApiResponse<string>(HttpStatusCode.OK, json);
 
     }
 }

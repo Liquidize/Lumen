@@ -36,5 +36,29 @@ namespace Lumen.Utils
             return default;
 
         }
+
+        public static string SerializeToJson(object obj)
+        {
+            if (obj == null) return string.Empty;
+
+            JsonSerializerSettings settings = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                ContractResolver = new DefaultContractResolver() { NamingStrategy = new CamelCaseNamingStrategy() }
+
+            };
+
+            try
+            {
+                return JsonConvert.SerializeObject(obj, settings);
+            }
+            catch (JsonException ex)
+            {
+                Log.Error(ex, $"Unable to serialize object {obj} to JSON.");
+            }
+
+            return string.Empty;
+        }
     }
 }

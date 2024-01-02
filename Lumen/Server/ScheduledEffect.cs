@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lumen.Api.Effects;
+using Lumen.Utils;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lumen.Server
 {
@@ -26,8 +29,12 @@ namespace Lumen.Server
         [JsonProperty("endMinute")]
         public uint EndMinute { get; protected set;}
 
+        /// <summary>
+        /// Settings stored as a JObject to allow for dynamic settings.
+        /// TODO: Find a way to make having it as a JObject not required.
+        /// </summary>
         [JsonProperty("settings")]
-        public Dictionary<string,object> Settings { get; protected set; }
+        public JObject Settings { get; protected set; }
 
         [JsonProperty("id")]
         public string Id { get; protected set; } = Guid.NewGuid().ToString("N").Substring(0, 8);

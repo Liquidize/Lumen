@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Lumen.Api.Effects;
 using Lumen.Api.Graphics;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lumen.Web.Request
 {
@@ -16,9 +18,9 @@ namespace Lumen.Web.Request
     /// <param name="Id">Unique ID of the effect to set the settings for</param>
     /// <param name="MergeDefaults">Whether to merge the default settings in for any missed keys, defaults to false. If false then merge in the current settings for any missed keys. If true merge in effect defaults.</param>
     /// <param name="Settings">JSON key-value object as a dictionary containing the new settings</param>
-    public record SetEffectSettingsRequest(string Location, string Id, bool MergeDefaults, Dictionary<string, object> Settings)
+    public record SetEffectSettingsRequest(string Location, string Id, bool MergeDefaults, JObject Settings)
     {
-        public SetEffectSettingsRequest() : this(string.Empty, string.Empty, false, new Dictionary<string, object>())
+        public SetEffectSettingsRequest() : this(string.Empty, string.Empty, false, new JObject())
         {
 
         }

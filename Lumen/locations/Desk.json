@@ -8,8 +8,8 @@
       "useCompression": true,
       "channel": 0,
       "swapRedGreen": false,
-      "batchSize": 20,
-      "framesPerBuffer": 250,
+      "batchSize": 1,
+      "framesPerBuffer": 60,
       "reversed": false,
       "offset": 0,
       "width": 678,
@@ -18,7 +18,7 @@
   ],
   "scheduledEffects": [
     {
-      "effectName": "ColorWipeEffect",
+      "effectName": "BreathingEffect",
       "id":  "testColorWipe",
       "daysOfWeek": ["all"],
       "startHour": 0,
@@ -27,17 +27,16 @@
       "endMinute": 60,
       "settings": {
         "color": {
-          "$type": "Lumen.Api.Graphics.LedColor, Lumen.Api",
           "r": 255,
-          "g": 128,
-          "b": 0
+          "g": 0,
+          "b": 100
         },
         "lifetime": 78.96,
         "frequency": 5
       }
     }
   ],
-  "framesPerSecond": 60,
+  "framesPerSecond": 21,
   "canvasType": "Canvas1D",
   "width": 678,
   "height": 1
