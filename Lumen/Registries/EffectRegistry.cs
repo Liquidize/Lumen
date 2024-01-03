@@ -13,7 +13,9 @@ namespace Lumen.Registries
 {
     public interface IEffectRegistry
     {
-        public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, JObject settings);
+        public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, EffectSettings settings);
+        public Type GetEffectType(string effectName);
+        public Type GetSettingsType(string effectName);
     }
 
     public class EffectRegistry : IEffectRegistry
@@ -47,7 +49,7 @@ namespace Lumen.Registries
         /// <param name="settings">JObject of the settings TODO: Find way to make passing just an EffectSettings type work...</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, JObject settings)
+        public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, EffectSettings settings)
         {
             try
             {
@@ -80,15 +82,8 @@ namespace Lumen.Registries
                 var settingsType = settingsParameter.ParameterType;
                 if (settingsType != null)
                 {
-                    var newSettings = settings.ToObject(settingsType);
-
-                    if (newSettings == null)
-                    {
-                        throw new InvalidOperationException(
-                            $"Failed to deserialize settings for effect '{effectName}'.");
-                    }
-
-                    return (LedEffect)constructor.Invoke(new object[] { canvas, newSettings });
+                  
+                    return (LedEffect)constructor.Invoke(new object[] { canvas, settings });
                 }
                 else
                 {
@@ -101,6 +96,33 @@ namespace Lumen.Registries
                     $"An error occurred while creating the effect '{effectName}'. See inner exception for details.",
                     ex);
             }
+        }
+
+
+        public Type? GetSettingsType(string effectName)
+        {
+            var effect = GetEffectType(effectName);
+            if (effect == null)
+                return null;
+
+            var constructors = effect.GetConstructors();
+            var parameters = constructors.FirstOrDefault(c =>
+                c.GetParameters().FirstOrDefault(p => p.ParameterType.BaseType == typeof(EffectSettings)) != null);
+            var settingsType = parameters?.GetParameters().FirstOrDefault(p => p.ParameterType.BaseType == typeof(EffectSettings))?.ParameterType;
+            if (settingsType == null)
+                return null;
+            return settingsType;
+        }
+
+        public Type? GetSettingsType(Type effectType)
+        {
+            var constructors = effectType.GetConstructors();
+            var parameters = constructors.FirstOrDefault(c =>
+                               c.GetParameters().FirstOrDefault(p => p.ParameterType.BaseType == typeof(EffectSettings)) != null);
+            var settingsType = parameters?.GetParameters().FirstOrDefault(p => p.ParameterType.BaseType == typeof(EffectSettings))?.ParameterType;
+            if (settingsType == null)
+                return null;
+            return settingsType;
         }
     }
 }

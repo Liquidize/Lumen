@@ -51,11 +51,11 @@ namespace Lumen.Server
         public bool IsApiEnabled { get; protected set; } = true;
 
         [JsonIgnore]
-        public LedEffect ActiveEffect { get; protected set; } = null;
+        public LedEffect? ActiveEffect { get; protected set; } = null;
 
-        private LedEffect _forcedEffect { get;  set; } = null;
+        private LedEffect? _forcedEffect { get;  set; } = null;
 
-        private readonly ConcurrentQueue<LedEffect> effectQueue = new ConcurrentQueue<LedEffect>();
+        private readonly ConcurrentQueue<LedEffect?> effectQueue = new ConcurrentQueue<LedEffect?>();
 
         private DateTime _lastUpdateTime;
 
@@ -181,14 +181,14 @@ namespace Lumen.Server
         }
 
 
-        public void SetForcedEffect(LedEffect effect)
+        public void SetForcedEffect(LedEffect? effect)
         {
             if (ActiveEffect != null) 
                 ActiveEffect.RequestEnd();
             _forcedEffect = effect;
         }
 
-        public void EnqueueEffect(LedEffect effect)
+        public void EnqueueEffect(LedEffect? effect)
         {
             if (effect == null) return;
             effectQueue.Enqueue(effect);
@@ -222,7 +222,7 @@ namespace Lumen.Server
         }
 
 
-        public ConcurrentQueue<LedEffect> GetEffectQueue()
+        public ConcurrentQueue<LedEffect?> GetEffectQueue()
         {
             return effectQueue;
         }
@@ -254,25 +254,20 @@ namespace Lumen.Server
                     Controllers = null;
                     ScheduledEffects = null;
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
                 disposedValue = true;
             }
         }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~Location()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
 
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public LedEffect? GetEffect(string id)
+        {
+            return effectQueue.Concat(new []{ ActiveEffect }).FirstOrDefault(x => x != null && x.Id == id);
         }
     }
 }

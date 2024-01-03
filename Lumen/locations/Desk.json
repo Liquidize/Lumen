@@ -8,8 +8,8 @@
       "useCompression": true,
       "channel": 0,
       "swapRedGreen": false,
-      "batchSize": 1,
-      "framesPerBuffer": 60,
+      "batchSize": 20,
+      "framesPerBuffer": 500,
       "reversed": false,
       "offset": 0,
       "width": 678,
@@ -27,11 +27,11 @@
       "endMinute": 60,
       "settings": {
         "color": {
-          "r": 255,
+          "r": 0,
           "g": 0,
-          "b": 100
+          "b": 0
         },
-        "lifetime": 78.96,
+        "lifetime": 0,
         "frequency": 5
       }
     }
