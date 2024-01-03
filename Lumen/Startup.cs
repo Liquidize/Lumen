@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lumen.Api.Graphics;
 using Lumen.Registries;
+using Lumen.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Lumen
 {
@@ -32,11 +34,6 @@ namespace Lumen
             services.AddSingleton<ICanvasRegistry, CanvasRegistry>();
             services.AddSingleton<IEffectRegistry, EffectRegistry>();
             services.AddSingleton<ILocationRegistry,LocationRegistry>();
-            services.AddControllers().AddNewtonsoftJson(options =>
-            {
-                options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            });
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -45,11 +42,22 @@ namespace Lumen
                         builder.AllowAnyOrigin();
                     });
             });
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+
             services.AddMvc();
             services.AddOptions();
-            
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Lumen API", Version = "v1" });
+                c.SchemaGeneratorOptions.UseOneOfForPolymorphism = true;
+                c.SchemaFilter<SwaggerIgnoreSchemaFilter>();
+            });
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
+            services.AddEndpointsApiExplorer();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

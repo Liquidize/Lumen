@@ -14,7 +14,7 @@ namespace Lumen.Registries
     public interface ILocationRegistry
     {
         public List<Location> GetLocations();
-        public Location GetLocation(string name);
+        public Location? GetLocation(string name);
 
         public void LoadLocations();
     }
@@ -259,7 +259,7 @@ namespace Lumen.Registries
             return AllLocations;
         }
 
-        public Location GetLocation(string name)
+        public Location? GetLocation(string name)
         {
             return AllLocations.FirstOrDefault(x => x.Name == name);
         }

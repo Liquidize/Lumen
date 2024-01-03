@@ -40,7 +40,7 @@ public class EffectsApi : ControllerBase
 
         if (string.IsNullOrEmpty(data.Location) || string.IsNullOrEmpty(data.Effect))
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location and effect name are required");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, "A location and effect name are required");
         }
 
         var guid = data.Id;
@@ -54,12 +54,12 @@ public class EffectsApi : ControllerBase
         if (location == null)
         {
             Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, "Location not found");
         }
 
         if (!location.IsApiEnabled)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, "API not enabled on location");
         }
 
 
@@ -67,13 +67,13 @@ public class EffectsApi : ControllerBase
 
         if (effect == null)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, $"No effect found with name {data.Effect}");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, $"No effect found with name {data.Effect}");
         }
 
         effect.SetId(guid);
 
-        location.SetForcedEffect((LedEffect)effect);
-        return new ApiResponse<string>(HttpStatusCode.OK, guid);
+        location.SetForcedEffect((LedEffect<EffectSettings>)effect);
+        return new ApiResponse<string>(HttpStatusCode.OK, guid, "");
 
     }
 
@@ -89,7 +89,7 @@ public class EffectsApi : ControllerBase
 
         if (string.IsNullOrEmpty(data.Location) || string.IsNullOrEmpty(data.Effect))
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location and effect name are required");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, "A location and effect name are required");
         }
 
         var guid = data.Id;
@@ -103,30 +103,30 @@ public class EffectsApi : ControllerBase
         if (location == null)
         {
             Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, "Location not found");
         }
 
         if (!location.IsApiEnabled)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, "API not enabled on location");
         }
 
         if (location.IsEffectQueued(guid))
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, $"Effect with ID {guid} already exists in the queue");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, $"Effect with ID {guid} already exists in the queue");
         }
 
         var effect = _effectRegistry.CreateEffectInstance(data.Effect, location.Canvas, data.Settings);
 
         if (effect == null)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, $"No effect found with name {data.Effect}");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, null, $"No effect found with name {data.Effect}");
         }
 
         effect.SetId(guid);
 
         location.EnqueueEffect(effect);
-        return new ApiResponse<string>(HttpStatusCode.OK, guid);
+        return new ApiResponse<string>(HttpStatusCode.OK, guid, "");
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public class EffectsApi : ControllerBase
 
         if (string.IsNullOrEmpty(data.Location))
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location is required");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location is required", "");
         }
 
         var location =
@@ -150,17 +150,17 @@ public class EffectsApi : ControllerBase
         if (location == null)
         {
             Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found", "");
         }
 
         if (!location.IsApiEnabled)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location","");
         }
 
         location.GetEffectQueue().Clear();
 
-        return new ApiResponse<string>(HttpStatusCode.OK, "Cleared");
+        return new ApiResponse<string>(HttpStatusCode.OK, "Cleared", "");
 
     }
 
@@ -176,7 +176,7 @@ public class EffectsApi : ControllerBase
 
         if (string.IsNullOrEmpty(data.Location))
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location is required");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location is required", "");
         }
 
         var location =
@@ -184,18 +184,18 @@ public class EffectsApi : ControllerBase
         if (location == null)
         {
             Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found", "");
         }
 
         if (!location.IsApiEnabled)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
+            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location", "");
         }
 
         // Request the active effect to end by setting the forced effect to nothing.
         location.SetForcedEffect(null);
 
-        return new ApiResponse<string>(HttpStatusCode.OK, "Cleared");
+        return new ApiResponse<string>(HttpStatusCode.OK, "Cleared", "");
     }
 
     /// <summary>
@@ -205,41 +205,50 @@ public class EffectsApi : ControllerBase
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost("effects/settings/set")]
-    public async Task<ApiResponse<string>> SetEffectSettings(SetEffectSettingsRequest data)
+    public async Task<ApiResponse<EffectSettings>> SetEffectSettings(SetEffectSettingsRequest data)
     {
-        Log.Information($"[HTTP] { nameof(SetEffectSettings)} triggered with {data}.");
-
-        if (string.IsNullOrEmpty(data.Location) || string.IsNullOrEmpty(data.Id))
+        try
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location and effect Id are required");
+            Log.Information($"[HTTP] {nameof(SetEffectSettings)} triggered with {data}.");
+
+            if (string.IsNullOrEmpty(data.Location) || string.IsNullOrEmpty(data.Id))
+            {
+                return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, string.Copy("A location and effect Id are required"));
+            }
+
+            var location =
+                _locationRegistry.GetLocation(data.Location);
+
+            if (location == null)
+            {
+                Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
+                return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, "Location not found");
+            }
+
+            if (!location.IsApiEnabled)
+            {
+                return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null,"API not enabled on location");
+            }
+
+
+            var effects = new List<LedEffect>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
+            var effect = effects.FirstOrDefault(e => e.Id == data.Id);
+            if (effect == null)
+            {
+                return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, $"No effect found with ID {data.Id}");
+            }
+
+            effect.SetEffectSettings(data.Settings);
+
+            var settings = effect.GetEffectSettings();
+
+            return new ApiResponse<EffectSettings>(HttpStatusCode.OK, settings, "");
         }
-
-        var location =
-            _locationRegistry.GetLocation(data.Location);
-
-        if (location == null)
+        catch (Exception ex)
         {
-                        Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+            Log.Error(ex, $"[HTTP] {nameof(SetEffectSettings)} failed with {data}.");
+            return new ApiResponse<EffectSettings>(HttpStatusCode.InternalServerError, null, ex.Message);
         }
-
-        if (!location.IsApiEnabled)
-        {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
-        }
-
-
-        var effects = new List<LedEffect>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
-        var effect = effects.FirstOrDefault(e => e.Id == data.Id);
-        if (effect == null)
-        {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, $"No effect found with ID {data.Id}");
-        }
-
-        effect.SetEffectSettings(data.Settings,data.MergeDefaults);
-
-
-        return new ApiResponse<string>(HttpStatusCode.OK, JsonConvert.SerializeObject(effect.GetEffectSettings()));
     }
 
     /// <summary>
@@ -248,13 +257,13 @@ public class EffectsApi : ControllerBase
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost("effects/settings/get")]
-    public async Task<ApiResponse<string>> GetEffectSettings(GetEffectSettingsRequest data)
+    public async Task<ApiResponse<EffectSettings>> GetEffectSettings(GetEffectSettingsRequest data)
     {
         Log.Information($"[HTTP] {nameof(GetEffectSettings)} triggered with {data}.");
 
         if (string.IsNullOrEmpty(data.Location) || string.IsNullOrEmpty(data.Id))
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "A location and effect Id are required");
+            return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, "A location and effect Id are required");
         }
 
         var location =
@@ -263,22 +272,24 @@ public class EffectsApi : ControllerBase
         if (location == null)
         {
             Log.Warning($"[HTTP] No location found with the given data for request {nameof(SetEffect)}.");
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "Location not found");
+            return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, "Location not found");
         }
 
         if (!location.IsApiEnabled)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, "API not enabled on location");
+            return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, "API not enabled on location");
         }
 
         var effects = new List<LedEffect>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
         var effect = effects.FirstOrDefault(e => e.Id == data.Id);
         if (effect == null)
         {
-            return new ApiResponse<string>(HttpStatusCode.BadRequest, $"No effect found with ID {data.Id}");
+            return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, $"No effect found with ID {data.Id}");
         }
 
-        return new ApiResponse<string>(HttpStatusCode.OK, JsonConvert.SerializeObject(effect.GetEffectSettings()));
+        var settings = effect.GetEffectSettings();
+
+        return new ApiResponse<EffectSettings>(HttpStatusCode.OK, settings, "");
 
     }
 }

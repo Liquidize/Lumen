@@ -7,10 +7,13 @@ namespace Lumen.Web
         public HttpStatusCode StatusCode { get; init; }
         public T Content { get; init; }
 
-        public ApiResponse(HttpStatusCode statusCode, T content)
+        private string Message { get; init; }
+
+        public ApiResponse(HttpStatusCode statusCode, T content, string message)
         {
             StatusCode = statusCode;
             Content = content;
+            Message = message;
         }
     }
 }
