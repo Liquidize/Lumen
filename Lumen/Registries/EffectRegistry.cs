@@ -14,15 +14,15 @@ namespace Lumen.Registries
     public interface IEffectRegistry
     {
         public LedEffect CreateEffectInstance(string effectName, ILedCanvas canvas, EffectSettings settings);
-        public Type GetEffectType(string effectName);
-        public Type GetSettingsType(string effectName);
+        public Type? GetEffectType(string effectName);
+        public Type? GetSettingsType(string effectName);
     }
 
     public class EffectRegistry : IEffectRegistry
     {
         private readonly Dictionary<string, Type> _effectTypes = new Dictionary<string, Type>();
 
-        public Type GetEffectType(string effectName)
+        public Type? GetEffectType(string effectName)
         {
             return _effectTypes[effectName] ?? null;
         }

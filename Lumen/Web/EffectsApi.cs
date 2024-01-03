@@ -72,7 +72,7 @@ public class EffectsApi : ControllerBase
 
         effect.SetId(guid);
 
-        location.SetForcedEffect((LedEffect<EffectSettings>)effect);
+        location.SetForcedEffect((LedEffect?)effect);
         return new ApiResponse<string>(HttpStatusCode.OK, guid, "");
 
     }
@@ -213,7 +213,7 @@ public class EffectsApi : ControllerBase
 
             if (string.IsNullOrEmpty(data.Location) || string.IsNullOrEmpty(data.Id))
             {
-                return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, string.Copy("A location and effect Id are required"));
+                return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, "A location and effect Id are required");
             }
 
             var location =
@@ -231,8 +231,8 @@ public class EffectsApi : ControllerBase
             }
 
 
-            var effects = new List<LedEffect>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
-            var effect = effects.FirstOrDefault(e => e.Id == data.Id);
+            var effects = new List<LedEffect?>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
+            var effect = effects.FirstOrDefault(e => e != null && e.Id == data.Id);
             if (effect == null)
             {
                 return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, $"No effect found with ID {data.Id}");
@@ -280,8 +280,8 @@ public class EffectsApi : ControllerBase
             return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, "API not enabled on location");
         }
 
-        var effects = new List<LedEffect>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
-        var effect = effects.FirstOrDefault(e => e.Id == data.Id);
+        var effects = new List<LedEffect?>() { location.ActiveEffect }.Concat(location.GetEffectQueue());
+        var effect = effects.FirstOrDefault(e => e != null && e.Id == data.Id);
         if (effect == null)
         {
             return new ApiResponse<EffectSettings>(HttpStatusCode.BadRequest, null, $"No effect found with ID {data.Id}");

@@ -75,7 +75,7 @@ namespace Lumen.Network
         [JsonIgnore] public ControllerResponse Response;
 
         [JsonIgnore]
-        public ControllerSocket ControllerSocket
+        public ControllerSocket? ControllerSocket
         {
             get { return ControllerSocketForHost(Host); }
         }
@@ -121,7 +121,7 @@ namespace Lumen.Network
 
         }
 
-        public static ControllerSocket ControllerSocketForHost(string host)
+        public static ControllerSocket? ControllerSocketForHost(string host)
         {
             if (_hostSockets.ContainsKey(host))
             {
@@ -150,7 +150,7 @@ namespace Lumen.Network
 
             _lastSendTime = DateTime.UtcNow;
 
-            ControllerSocket socket = ControllerSocketForHost(Host);
+            ControllerSocket? socket = ControllerSocketForHost(Host);
             if (socket == null)
             {
                 Log.Information("Socket is null on compression and queue");
@@ -322,7 +322,7 @@ namespace Lumen.Network
 
 
 
-        public ControllerSocket GetControllerSocket()
+        public ControllerSocket? GetControllerSocket()
         {
             if (_hostSockets.ContainsKey(Host))
             {

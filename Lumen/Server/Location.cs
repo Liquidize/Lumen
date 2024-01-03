@@ -194,7 +194,7 @@ namespace Lumen.Server
             effectQueue.Enqueue(effect);
         }
 
-        private LedEffect ProcessQueue(DateTime timeStamp)
+        private LedEffect? ProcessQueue(DateTime timeStamp)
         {
             if (_forcedEffect != null) return _forcedEffect;
 
