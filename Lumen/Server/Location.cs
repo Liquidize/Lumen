@@ -38,7 +38,7 @@ namespace Lumen.Server
 
         [JsonProperty("canvasType")] public string CanvasType { get; protected set; } = "Canvas1D";
 
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public Canvas Canvas { get; protected set; }
 
         [JsonProperty("width")]
@@ -56,8 +56,6 @@ namespace Lumen.Server
         private LedEffect? _forcedEffect { get;  set; } = null;
 
         private readonly ConcurrentQueue<LedEffect?> effectQueue = new ConcurrentQueue<LedEffect?>();
-
-        private DateTime _lastUpdateTime;
 
 
         [JsonIgnore]
