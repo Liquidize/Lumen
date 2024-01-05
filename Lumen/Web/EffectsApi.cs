@@ -12,7 +12,7 @@ using Serilog;
 namespace Lumen.Web;
 
 [ApiController]
-[Route("api")]
+[Route("api/effects")]
 public class EffectsApi : ControllerBase
 {
     private readonly IEffectRegistry _effectRegistry;
@@ -41,10 +41,12 @@ public class EffectsApi : ControllerBase
 
 
     /// <summary>
-    ///     Force sets an effect skipping the queue and overriding the active effect given the data from the request.
+    /// Sets an effect to play immediately on the location with the given effect name and settings.
     /// </summary>
-    /// <returns></returns>
-    [HttpPost("effects/set")]
+    /// <param name="data">The request data containing the location, effect name, settings, and optional effect ID.</param>
+    /// <returns>Returns the unique identifier of the effect.</returns>
+
+    [HttpPost("set")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
@@ -113,11 +115,11 @@ public class EffectsApi : ControllerBase
     }
 
     /// <summary>
-    /// Enqueues an effect to be played with the given data.
+    /// Queues an effect to be played from the provided effect name and settings.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    [HttpPost("effects/enqueue")]
+    /// <param name="data">The request data containing the location, effect name, settings, and optional effect ID.</param>
+    /// <returns>Returns the unique identifier of the effect.</returns>
+    [HttpPost("enqueue")]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
@@ -186,16 +188,16 @@ public class EffectsApi : ControllerBase
     }
 
     /// <summary>
-    /// Clears the queue of effects for the given location.
+    /// Clears the queue of effects for a location.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    [HttpPost("effects/clearqueue")]
+    /// <param name="data">The request data containing the location.</param>
+    /// <returns>Returns an HTTP status code indicating the result of the operation.</returns>
+    [HttpDelete("clear/queue")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> ClearEffectQueue(ClearEffectQueueRequest data)
+    public async Task<ActionResult> ClearEffectQueue([FromQuery] ClearEffectQueueRequest data)
     {
         try
         {
@@ -233,16 +235,16 @@ public class EffectsApi : ControllerBase
     }
 
     /// <summary>
-    /// Clears the active effect by setting the forced effect to null and requesting the active effect to end.
+    /// Clears the active effect by requesting it to end immediately.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    [HttpPost("effects/clearactive")]
+    /// <param name="data">The request data containing the location.</param>
+    /// <returns>Returns an HTTP status code indicating the result of the operation.</returns>
+    [HttpDelete("clear/active")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> ClearActiveEffect(ClearActiveEffectRequest data)
+    public async Task<ActionResult> ClearActiveEffect([FromQuery]ClearActiveEffectRequest data)
     {
         try
         {
@@ -280,12 +282,11 @@ public class EffectsApi : ControllerBase
     }
 
     /// <summary>
-    /// Sets the settings for the effect with the given ID, if the effect is not found in the queue or active effect, a 400 is returned.
-    /// If the effect is found and the settings are set successfully, a 200 is returned with the new settings in JSON format
+    /// Sets the settings for an effect from the provided effect ID and settings. If a setting is not provided, it will be set to the default value.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    [HttpPost("effects/settings/set")]
+    /// <param name="data">The request data containing the location, effect ID, and new settings for the effect.</param>
+    /// <returns>Returns the updated settings of the effect.</returns>
+    [HttpPatch("settings/set")]
     [ProducesResponseType(typeof(EffectSettings), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
@@ -337,16 +338,16 @@ public class EffectsApi : ControllerBase
     }
 
     /// <summary>
-    /// Gets the current settings for the effect with the given ID, if the effect is not found in the queue or active effect, a 400 is returned.
+    /// Gets the current settings of an effect from the provided location and effect ID. If the effect is not found in the queue or active effect, a 400 is returned.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    [HttpPost("effects/settings/get")]
+    /// <param name="data">The request data containing the location and effect ID.</param>
+    /// <returns>Returns the settings of the effect if found, otherwise an HTTP status code indicating the result of the operation.</returns>
+    [HttpGet("settings/get")]
     [ProducesResponseType(typeof(EffectSettings), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<EffectSettings>> GetEffectSettings(GetEffectSettingsRequest data)
+    public async Task<ActionResult<EffectSettings>> GetEffectSettings([FromQuery]GetEffectSettingsRequest data)
     {
         try
         {

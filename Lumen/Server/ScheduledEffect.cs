@@ -25,7 +25,7 @@ namespace Lumen.Server
                 new JProperty("startMinute", value.StartMinute),
                 new JProperty("endHour", value.EndHour),
                 new JProperty("endMinute", value.EndMinute),
-                new JProperty("settings", value.Settings),
+                new JProperty("settings", JObject.FromObject(value.Settings, serializer)),
                 new JProperty("id", value.Id)
             );
             jsonObject.WriteTo(writer);
@@ -137,6 +137,7 @@ namespace Lumen.Server
 
         }
 
+        [JsonIgnore]
         public bool IsEffectScheduledToRunNow
         {
             get
